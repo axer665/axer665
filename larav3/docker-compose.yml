@@ -1,0 +1,46 @@
+version: '3.8'
+
+volumes:
+  mysql-volume:
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    volumes:
+      - ./src/:/var/www/html
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=TIM
+      - DB_USERNAME=root
+      - DB_PASSWORD=132
+
+  web:
+    environment:
+      - WEB_PORT=8080
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    ports:
+      - 8080:80
+    depends_on:
+      - app
+    volumes:
+      - ./src/:/var/www/html
+
+  db:
+    build:
+      context: .
+      dockerfile: ./docker/mysql/Dockerfile
+    ports:
+      - 3310:3306
+    environment:
+      MYSQL_DATABASE: TIM
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 132
+      MYSQL_ROOT_PASSWORD: 132
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - mysql-volume:/var/lib/mysql
